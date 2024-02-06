@@ -5,7 +5,6 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use("/api/auth", authRoutes); // Use routes
 
 // Middleware
 app.use(bodyParser.json());
@@ -19,9 +18,23 @@ mongoose
       useUnifiedTopology: true,
     }
   )
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .then(() => {
+    console.log("MongoDB Connected");
+    
+    // Start the server after MongoDB connection is established
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB Connection Error:", err);
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Use authentication routes
+app.use("/api/auth", authRoutes);
+
+// Error handling middleware (optional)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
 });

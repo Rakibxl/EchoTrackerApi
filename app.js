@@ -1,40 +1,59 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const authRoutes = require("./routes/authRoutes");
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
+require('./passport-setup'); 
+
+require('dotenv').config({ path: '.env.development' });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+
+console.log(process.env.GOOGLE_CLIENT_ID); // This should print your client ID if loaded correctly
+
+// Middleware for body parsing
 app.use(bodyParser.json());
 
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET, 
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } 
+}));
+
+// Initialize Passport and restore authentication state, if any, from the session.
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Connect to MongoDB
-mongoose
-  .connect(
-    "mongodb+srv://zenith:zenith123@cluster0.i2uby.mongodb.net/EcoTracker_db?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
-  .then(() => {
-    console.log("MongoDB Connected");
-    
-    // Start the server after MongoDB connection is established
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:", err);
-  });
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.error("MongoDB Connection Error:", err));
 
-// Use authentication routes
-app.use("/api/auth", authRoutes);
 
-// Error handling middleware (optional)
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
+app.get('/home', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.send('You are authenticated');
+  } else {
+    res.redirect('/api/auth/login'); 
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send("Something went wrong!");
+  res.status(500).send('Something went wrong!');
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

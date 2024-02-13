@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors'); 
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
@@ -11,6 +12,7 @@ require('./models/Waste');
 require('dotenv').config({ path: '.env.development' });
 
 const app = express();
+app.use(cors()); 
 const PORT = process.env.PORT || 3000;
 
 

@@ -2,6 +2,8 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const WasteCategory = require('../models/WasteCategory');
+const Waste = require('../models/Waste');
 
 const router = express.Router();
 
@@ -11,10 +13,10 @@ require('dotenv').config({ path: '.env.development' });
 // Register a new user
 router.post("/register", async (req, res) => {
   try {
-    let { username, password } = req.body;
-    let user = new User({ username, password });
+    let { username, password, email } = req.body;
+    let user = new User({ username, password, email });
     await user.save();
-    res.status(201).send("User created successfully");
+    res.status(200).send("User created successfully");
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -37,7 +39,14 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ id: user._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
-    res.status(200).json({ token });
+
+    res.status(200).json({
+      token,
+      user: {
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -83,6 +92,15 @@ passport.deserializeUser((id, done) => {
   });
 });
 
+
+router.get("/homes", async (req, res) => {
+  try {
+    const wastes = await Waste.find().populate('IDWasteCategory');
+    res.json(wastes);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));

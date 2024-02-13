@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 require('./passport-setup'); 
+require('./models/WasteCategory');
+require('./models/Waste');
+
 
 require('dotenv').config({ path: '.env.development' });
 

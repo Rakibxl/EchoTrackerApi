@@ -102,6 +102,20 @@ router.get("/homes", async (req, res) => {
   }
 });
 
+router.get("/homes/:id", async (req, res) => {
+  try {
+    const Id = req.params.id; 
+    const waste = await Waste.findById(Id); 
+    if (!waste) {
+      return res.status(404).send('Waste not found');
+    }
+    res.json(waste);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
 router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
 

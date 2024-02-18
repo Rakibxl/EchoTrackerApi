@@ -5,7 +5,9 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, unique: true, sparse: true }, 
   password: { type: String }, 
   googleId: { type: String, unique: true, sparse: true }, 
-  email: { type: String, unique: true, sparse: true } 
+  email: { type: String, unique: true, sparse: true },
+  phonenumber: {type: String, default: ''},
+  address: {type: String, default: ''} 
 });
 
 // Password hashing middleware, only if password is provided

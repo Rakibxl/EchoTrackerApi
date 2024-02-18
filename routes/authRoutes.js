@@ -13,8 +13,8 @@ require('dotenv').config({ path: '.env.development' });
 // Register a new user
 router.post("/register", async (req, res) => {
   try {
-    let { username, password, email } = req.body;
-    let user = new User({ username, password, email });
+    let { username, password, email, phonenumber, address } = req.body;
+    let user = new User({ username, password, email, phonenumber, address});
     await user.save();
     res.status(200).send("User created successfully");
   } catch (error) {
@@ -43,8 +43,60 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       token,
       user: {
+        userid: user._id
+        }
+    });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
+router.get("/profile/:userid", async (req, res) => {
+  try {
+    const userId = req.params.userid;
+    const user = await User.findById(userId, 'username email phonenumber address').exec();
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    res.status(200).json({
+      username: user.username,
+      email: user.email,
+      phonenumber: user.phonenumber,
+      address: user.address
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).send("An error occurred while fetching user details.");
+  }
+});
+
+router.patch("/profile/:userid", async (req, res) => {
+  try {
+    const { userid } = req.params;
+    const { username, email, phonenumber, address } = req.body;
+    let updateData = {};
+
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+    if (phonenumber) updateData.phonenumber = phonenumber;
+    if (address) updateData.address = address;
+
+    const user = await User.findByIdAndUpdate(userid, updateData, { new: true, runValidators: true });
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
         username: user.username,
-        email: user.email
+        email: user.email,
+        phonenumber: user.phonenumber,
+        address: user.address
       }
     });
   } catch (error) {

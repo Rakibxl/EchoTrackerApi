@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-const Waste = require('./models/Waste'); // Update with the correct path to your Home model
-const WasteCategory = require('./models/WasteCategory'); // Update with the correct path to your WasteCategory model
+const Waste = require('./models/Waste'); 
+const WasteCategory = require('./models/WasteCategory'); 
+const Address = require('./models/Address'); 
+const Schedule = require('./models/Schedule'); 
 
 require('dotenv').config({ path: '.env.development' });
 
@@ -20,28 +22,49 @@ const seedDB = async () => {
     // Clear out the existing data
     await Waste.deleteMany({});
     await WasteCategory.deleteMany({});
+    await Address.deleteMany({});
+    await Schedule.deleteMany({});
 
     // Create some WasteCategory instances
-    const category1 = new WasteCategory({ description: 'Blue Bin' });
-    await category1.save();
+    // const category1 = new WasteCategory({ description: 'Blue Bin' });
+    // await category1.save();
 
-    const category2 = new WasteCategory({ description: 'Garbage Bin' });
-    await category2.save();
+    // const category2 = new WasteCategory({ description: 'Garbage Bin' });
+    // await category2.save();
+
+    const blueBin = new WasteCategory({ description: 'Blue Bin' });
+    await blueBin.save();
+
+    const garbageBin = new WasteCategory({ description: 'Garbage Bin' });
+    await garbageBin.save();
+
+
+    // Create an Address instance
+    const address = new Address({ address: 'Scarborough' });
+    await address.save();
 
     // Create some Home instances
     const waste1 = new Waste({
       description: 'Vegetable Discards',
-      image: 'path/to/plastic_image.jpg', // Replace with your image path or URL
-      IDWasteCategory: category1._id
+      image: 'path/to/plastic_image.jpg', 
+      IDWasteCategory: blueBin._id
     });
     await waste1.save();
 
     const waste2 = new Waste({
       description: 'Plastic Water Bottles',
-      image: 'path/to/paper_image.jpg', // Replace with your image path or URL
-      IDWasteCategory: category2._id
+      image: 'path/to/paper_image.jpg', 
+      IDWasteCategory: garbageBin._id
     });
     await waste2.save();
+
+    const scheduleDate = new Date(2024, 1, 20); 
+    const schedule = new Schedule({
+      ScheduleDate: scheduleDate,
+      AddressId: address._id,
+      IDWasteCategories: [blueBin._id, garbageBin._id] 
+    });
+    await schedule.save();
 
     console.log('Database seeded!');
 

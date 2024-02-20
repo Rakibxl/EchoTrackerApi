@@ -7,7 +7,8 @@ const passport = require('passport');
 require('./passport-setup'); 
 require('./models/WasteCategory');
 require('./models/Waste');
-
+require('./models/Address'); 
+require('./models/Schedule'); 
 
 require('dotenv').config({ path: '.env.development' });
 

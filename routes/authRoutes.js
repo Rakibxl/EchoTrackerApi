@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const WasteCategory = require("../models/WasteCategory");
 const Waste = require("../models/Waste");
+const Address = require("../models/Address");
+const Schedule = require("../models/Schedule");
 
 const router = express.Router();
 
@@ -109,7 +111,51 @@ router.patch("/profile/:userid", async (req, res) => {
   }
 });
 
-console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID); // or your hardcoded clientID
+router.get("/wastecategories", async (req, res) => {
+  try {
+    const wasteCategories = await WasteCategory.find({});
+    res.json(wasteCategories);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
+router.get("/wastecategories/:id", async (req, res) => {
+  try {
+    const wasteCategory = await WasteCategory.findById(req.params.id);
+    if (!wasteCategory) {
+      return res.status(404).send("WasteCategory not found");
+    }
+    res.json(wasteCategory);
+  } catch (error) {
+    // This checks if the error is because of an invalid ObjectId
+    if (error.kind === 'ObjectId') {
+      return res.status(400).send("Invalid ID format");
+    }
+    res.status(500).send(error.message);
+  }
+});
+
+router.get("/addresses", async (req, res) => {
+  try {
+    const addresses = await Address.find({});
+    res.json(addresses);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.get("/schedules", async (req, res) => {
+  try {
+    const schedules = await Schedule.find({}).populate('AddressId IDWasteCategories');
+    res.json(schedules);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID); 
 console.log("Google Client Secret:", process.env.GOOGLE_CLIENT_SECRET);
 
 const passport = require("passport");

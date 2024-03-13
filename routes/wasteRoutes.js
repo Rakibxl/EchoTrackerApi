@@ -10,6 +10,6 @@ const router = require("express").Router();
 router.get("/", getAllWastes);
 router.post("/", fileUpload.uploadImage, insertWaste);
 
-router.patch("/:wasteid", getSingleWaste);
+router.get("/:wasteid", getSingleWaste);
 
 module.exports = router;

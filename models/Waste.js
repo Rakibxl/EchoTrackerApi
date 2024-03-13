@@ -1,11 +1,15 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const WasteSchema = new mongoose.Schema({
-  uniqueID: { type: mongoose.Schema.Types.ObjectId, auto: true, index: true },
+  title: { type: String },
   description: { type: String },
-  IDWasteCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'WasteCategory' }
+  wasteCategories: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "WasteCategory",
+  },
+  imageSrc: { type: String },
 });
 
-const Waste = mongoose.model('Waste', WasteSchema);
+const Waste = mongoose.model("Waste", WasteSchema);
 
 module.exports = Waste;

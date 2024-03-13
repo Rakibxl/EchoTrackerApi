@@ -4,6 +4,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
+const PORT = process.env.PORT || 3000;
+
 require("./passport-setup");
 require("./models/WasteCategory");
 require("./models/Waste");
@@ -14,9 +16,6 @@ require("dotenv").config({ path: ".env.development" });
 
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT || 3000;
-
-console.log(process.env.GOOGLE_CLIENT_ID); // This should print your client ID if loaded correctly
 
 // Middleware for body parsing
 app.use(bodyParser.json());
@@ -45,15 +44,14 @@ mongoose
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
 const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
+const userRoutes = require("./routes/userRoutes");
+const wasteRoutes = require("./routes/wasteRoutes");
+const wasteCategoryRoutes = require("./routes/wasteCategoryRoutes");
 
-app.get("/home", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.send("You are authenticated");
-  } else {
-    res.redirect("/api/auth/login");
-  }
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/waste", wasteRoutes);
+app.use("/api/wastecategory", wasteCategoryRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

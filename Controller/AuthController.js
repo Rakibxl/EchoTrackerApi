@@ -26,13 +26,20 @@ const registerUser = async (req, res) => {
       email,
       phonenumber,
       lastName,
-      streetName,
-      postalCode,
+    });
+    let address = new Address({
+      aptNumber,
       city,
       province,
-      aptNumber,
+      postalCode,
+      streetName,
     });
-    await user.save();
+    await address.save().then((res) => {
+      console.log(res._id);
+      user.address = res._id;
+      user.save();
+    });
+    // await user.save();
     res.status(200).send("User created successfully");
   } catch (error) {
     res.status(500).send(error.message);

@@ -7,6 +7,7 @@ const WasteSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "WasteCategory",
   },
+  throwingInstruction: { type: [String] },
   imageSrc: { type: String },
 });
 

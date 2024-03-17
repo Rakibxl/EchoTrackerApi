@@ -15,7 +15,7 @@ const insertWaste = async (req, res) => {
         req.file.filename;
     }
     let waste = new Waste({
-      wasteCategoryID,
+      wasteCategories: wasteCategoryID,
       title,
       description,
       imageSrc: img_src,
@@ -29,7 +29,7 @@ const insertWaste = async (req, res) => {
 };
 const getAllWastes = async (req, res) => {
   try {
-    const wastes = await Waste.find().populate("IDWasteCategory");
+    const wastes = await Waste.find();
     res.json(wastes);
   } catch (error) {
     res.status(500).send(error.message);
@@ -38,7 +38,9 @@ const getAllWastes = async (req, res) => {
 
 const getSingleWaste = async (req, res) => {
   try {
-    const singleWaste = await Waste.findById(req.params.id);
+    const singleWaste = await Waste.findById(req.params.wasteid).populate(
+      "wasteCategories"
+    );
     if (!singleWaste) {
       return res.status(404).send("Waste not found");
     }

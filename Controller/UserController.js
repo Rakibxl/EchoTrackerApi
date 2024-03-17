@@ -3,22 +3,17 @@ const User = require("../models/User");
 const getSingleProfile = async (req, res) => {
   try {
     const userId = req.params.userid;
-    const user = await User.findById(userId).exec();
+    const user = await User.findById(userId).populate("address").exec();
 
     if (!user) {
       return res.status(404).send("User not found");
     }
-
+    console.log(user);
     res.status(200).json({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       phonenumber: user.phonenumber,
-      streetName: user.streetName,
-      city: user.city,
-      province: user.province,
-      postalCode: user.postalCode,
-      aptNumber: user.aptNumber,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

@@ -10,7 +10,7 @@ const AddressSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Schedule",
-      required: true,
+      required: false,
     },
   ],
 });

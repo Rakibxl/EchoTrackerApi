@@ -1,49 +1,101 @@
-const DropOff = require("../models/DropOff");
+const Schedule = require("../models/Schedule");
+const Address = require("../models/Address");
+const WasteCategory = require("../models/WasteCategory");
+const User = require("../models/User");
 
-const insertDropOff = async (req, res) => {
+const getSchedulebyuser = (req, res) => {
   try {
-    let { address, description, title, latitude, longitude } = req.body;
+    let { userId } = req.body;
 
-    let dropOff = new DropOff({
-      title,
-      description,
-      latitude,
-      longitude,
-      address,
+    console.log(req.body);
+    User.findById(userId).then((userVal) => {
+      Address.findById(userVal.address)
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "wastecategories",
+            model: WasteCategory,
+          },
+        })
+        .then((addressVal) => {
+          res.status(200).send({ address: addressVal });
+        });
     });
-    await dropOff.save();
-    res.status(200).send({
-      message: "Drop Off Location Created Successfully",
-      data: dropOff,
-    });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
-
-const getAllDropOff = async (req, res) => {
-  try {
-    const dropOffs = await DropOff.find();
-    res.json(dropOffs);
   } catch (error) {
-    res.status(500).send(err.message);
-  }
-};
-
-const getSingleDropOff = async (req, res) => {
-  try {
-    const singleDropOff = await DropOff.findById(req.params.dropOffId);
-
-    if (!singleDropOff) {
-      return res.status(404).send("Drop Off Location Not Found");
-    }
-    res.status(200).send(singleDropOff);
-  } catch (error) {
-    if (error.kind === "ObjectId") {
-      return res.status(404).send("Invalid ID format");
-    }
     res.status(500).send(error.message);
   }
 };
 
-module.exports = { insertDropOff, getAllDropOff, getSingleDropOff };
+const getAllSchedule = async (req, res) => {
+  try {
+    const schedule = await Schedule.find();
+    res.json(schedule);
+  } catch (error) {
+    res.status(500).send(err.message);
+  }
+};
+
+const insertSchedule = (req, res) => {
+  try {
+    let { scheduleDate, addressId } = req.body;
+    let schedule = new Schedule({
+      ScheduleDate: scheduleDate,
+    });
+    let address = Address.findById(addressId);
+
+    if (!address) {
+      res.status(404).send("Address not found!");
+    }
+    schedule.save().then((response) => {
+      Address.findByIdAndUpdate(
+        { _id: addressId },
+        {
+          $push: { schedule: response },
+        },
+        { new: true }
+      )
+        .then(() => {
+          res.status(200).send({
+            message: "Schedule Inserted Successfully",
+          });
+        })
+        .catch((error) => {
+          res.status(500).send(error.message);
+        });
+    });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+const addWasteCategorytoSchedule = (req, res) => {
+  try {
+    let { wasteCategoryID, scheduleID } = req.body;
+    let wasteCategory = WasteCategory.findById(wasteCategoryID);
+
+    if (!wasteCategory) {
+      res.status(404).send("Waste Category not found!");
+    }
+    Schedule.findByIdAndUpdate(
+      { _id: scheduleID },
+      { $push: { wastecategories: wasteCategoryID } },
+      { new: true }
+    )
+      .then(() => {
+        res.status(200).send({
+          message: "Schedule Inserted Successfully",
+        });
+      })
+      .catch((error) => {
+        res.status(500).send(error.message);
+      });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+module.exports = {
+  getSchedulebyuser,
+  insertSchedule,
+  getAllSchedule,
+  addWasteCategorytoSchedule,
+};

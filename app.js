@@ -54,13 +54,16 @@ const userRoutes = require("./routes/userRoutes");
 const wasteRoutes = require("./routes/wasteRoutes");
 const wasteCategoryRoutes = require("./routes/wasteCategoryRoutes");
 const dropOffRoutes = require("./routes/dropOffRoutes");
-const Schedule = require("./models/Schedule");
+const schedule = require("./routes/ScheduleRoutes");
+const address = require("./routes/addressRoutes");
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/waste", wasteRoutes);
 app.use("/api/wastecategory", wasteCategoryRoutes);
-app.use("/api/schedule", Schedule);
+app.use("/api/schedule", schedule);
 app.use("/api/dropoff", dropOffRoutes);
+app.use("/api/address", address);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

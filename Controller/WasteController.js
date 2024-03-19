@@ -5,14 +5,20 @@ const insertWaste = async (req, res) => {
     let { title, description, wasteCategoryID } = req.body;
     let img_src;
     if (req.file) {
-      img_src =
-        req.protocol +
-        "://" +
-        req.hostname +
-        ":" +
-        process.env.PORT +
-        "/image/" +
-        req.file.filename;
+      if (process.env.MODE === "DEV") {
+        img_src =
+          req.protocol +
+          "://" +
+          req.hostname +
+          ":" +
+          process.env.PORT +
+          "/image/" +
+          req.file.filename;
+      }
+      if (process.env.MODE === "LIVE") {
+        img_src =
+          req.protocol + "://" + req.hostname + "/image/" + req.file.filename;
+      }
     }
     let waste = new Waste({
       wasteCategories: wasteCategoryID,

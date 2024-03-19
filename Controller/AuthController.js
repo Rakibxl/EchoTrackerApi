@@ -35,7 +35,6 @@ const registerUser = async (req, res) => {
       streetName,
     });
     await address.save().then((res) => {
-      console.log(res._id);
       user.address = res._id;
       user.save();
     });

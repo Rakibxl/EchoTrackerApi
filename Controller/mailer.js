@@ -69,8 +69,9 @@ const mailgun = new Mailgun(formData);
 
 const sendWasteDisposalReminder = async (userEmail, userName, scheduleDate) => {
   const emailTemplate = generateEmailTemplate(userName, scheduleDate);
+console.log("Api key", process.env.MAILGUN_API_KEY)
 
-  const mg = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || '39945a7e65c12f714f76f6fcda0ecb10-4c205c86-13b4d9f9'});
+  const mg = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || ''});
 
   mg.messages.create('sandboxfcaf96278def4413a3a215ab48b0b811.mailgun.org', {
       from: 'merakib007@gmail.com',

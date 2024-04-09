@@ -79,22 +79,14 @@ const sendWasteDisposalReminder = async (userEmail, userName, scheduleDate) => {
 
     try {
         //The retrieval of Mailgun credentials is now correctly placed inside an async function
-         const mailgunCredentials = await ApiCredential.findOne({ serviceProvider: 'mailgun' });
-         if (!mailgunCredentials) {
-             console.error('Mailgun credentials not found');
-             return;
-         }
+         
 
-        const apiKey =  'ecotracker';
-        const password = 'df1614430bf65fa0edda1410169068cd-4b670513-0821a00c'; 
+        const apiKey =  process.env.MAILGUN_API_KEY
+        const password =  process.env.MAILGUN_API_PASSWORD
 
-        console.log("api ", apiKey)
-
-        console.log("apipws ", password)
-        
         const mg = mailgun.client({ username: apiKey, key: password });
 
-        mg.messages.create('sandbox59f183c411dc4c56a477e95cac396356.mailgun.org', {
+        mg.messages.create(process.env.MAILGUN_EMAIL_SENDER, {
             from: 'ecotracker526@gmail.com',
             to: userEmail,
             subject: "Waste Disposal Reminder",

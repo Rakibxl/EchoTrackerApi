@@ -59,6 +59,7 @@ const dropOffRoutes = require("./routes/dropOffRoutes");
 const schedule = require("./routes/ScheduleRoutes");
 const address = require("./routes/addressRoutes");
 const news = require("./routes/NewsRoutes");
+const events = require("./routes/eventRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
@@ -68,6 +69,8 @@ app.use("/api/schedule", schedule);
 app.use("/api/dropoff", dropOffRoutes);
 app.use("/api/address", address);
 app.use("/api/news", news);
+app.use("/api/events", events);
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

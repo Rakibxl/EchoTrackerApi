@@ -12,6 +12,8 @@ require("./models/Waste");
 require("./models/Address");
 require("./models/Schedule");
 require("./models/DropOff");
+require("./models/News");
+require("./models/Events");
 
 require("dotenv").config({ path: ".env.development" });
 
@@ -56,6 +58,7 @@ const wasteCategoryRoutes = require("./routes/wasteCategoryRoutes");
 const dropOffRoutes = require("./routes/dropOffRoutes");
 const schedule = require("./routes/ScheduleRoutes");
 const address = require("./routes/addressRoutes");
+const news = require("./routes/NewsRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
@@ -64,6 +67,7 @@ app.use("/api/wastecategory", wasteCategoryRoutes);
 app.use("/api/schedule", schedule);
 app.use("/api/dropoff", dropOffRoutes);
 app.use("/api/address", address);
+app.use("/api/news", news);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

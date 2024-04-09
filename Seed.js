@@ -21,10 +21,12 @@ mongoose.connect(process.env.MONGODB_URI, {
 const seedDB = async () => {
   try {
     // Clear out the existing data
-    await Waste.deleteMany({});
-    await WasteCategory.deleteMany({});
-    await Address.deleteMany({});
-    await Schedule.deleteMany({});
+    // await Waste.deleteMany({});
+    // await WasteCategory.deleteMany({});
+    // await Address.deleteMany({});
+    // await Schedule.deleteMany({});
+     await ApiCredential.deleteMany({});
+
 
     // Create some WasteCategory instances
     // const category1 = new WasteCategory({ description: 'Blue Bin' });
@@ -33,45 +35,45 @@ const seedDB = async () => {
     // const category2 = new WasteCategory({ description: 'Garbage Bin' });
     // await category2.save();
 
-    const blueBin = new WasteCategory({ description: 'Blue Bin' });
-    await blueBin.save();
+    // const blueBin = new WasteCategory({ description: 'Blue Bin' });
+    // await blueBin.save();
 
-    const garbageBin = new WasteCategory({ description: 'Garbage Bin' });
-    await garbageBin.save();
+    // const garbageBin = new WasteCategory({ description: 'Garbage Bin' });
+    // await garbageBin.save();
 
 
     // Create an Address instance
-    const address = new Address({ address: 'Scarborough' });
-    await address.save();
+    // const address = new Address({ address: 'Scarborough' });
+    // await address.save();
 
     // Create some Home instances
-    const waste1 = new Waste({
-      description: 'Vegetable Discards',
-      image: 'path/to/plastic_image.jpg', 
-      IDWasteCategory: blueBin._id
-    });
-    await waste1.save();
+    // const waste1 = new Waste({
+    //   description: 'Vegetable Discards',
+    //   image: 'path/to/plastic_image.jpg', 
+    //   IDWasteCategory: blueBin._id
+    // });
+    // await waste1.save();
 
-    const waste2 = new Waste({
-      description: 'Plastic Water Bottles',
-      image: 'path/to/paper_image.jpg', 
-      IDWasteCategory: garbageBin._id
-    });
-    await waste2.save();
+    // const waste2 = new Waste({
+    //   description: 'Plastic Water Bottles',
+    //   image: 'path/to/paper_image.jpg', 
+    //   IDWasteCategory: garbageBin._id
+    // });
+    // await waste2.save();
 
-    const scheduleDate = new Date(2024, 1, 20); 
-    const schedule = new Schedule({
-      ScheduleDate: scheduleDate,
-      AddressId: address._id,
-      IDWasteCategories: [blueBin._id, garbageBin._id] 
-    });
-    await schedule.save();
+    // const scheduleDate = new Date(2024, 1, 20); 
+    // const schedule = new Schedule({
+    //   ScheduleDate: scheduleDate,
+    //   AddressId: address._id,
+    //   IDWasteCategories: [blueBin._id, garbageBin._id] 
+    // });
+    // await schedule.save();
 
 
     const mailgunCredentials = new ApiCredential({
-      serviceProvider: 'Mailgun',
-      apiKey: 'ENCRYPTED_API_KEY_HERE',
-      password: 'ENCRYPTED_PASSWORD_HERE'
+      serviceProvider: 'mailgun',
+      apiKey: 'ecotracker',
+      password: 'df1614430bf65fa0edda1410169068cd-4b670513-0821a00c'
     });
     await mailgunCredentials.save();
 

@@ -1,7 +1,12 @@
-
-
 require('dotenv').config();
-require('dotenv').config({ path: '.env.development' });
+const mongoose = require('mongoose');
+// Correctly require the node-mailjet module
+const mailjetLibrary = require('node-mailjet');
+
+// This function will be corrected to use environment variables for Mailjet API credentials
+async function initializeMailjet() {
+    return mailjetLibrary.connect('e8d23cab3d9ccb3fb6a9374e3db85963', '5f2d5be91fc93b899fd90f73c8f75892');
+}
 
 const generateEmailTemplate = (name, date) => `
 <!DOCTYPE html>
@@ -66,56 +71,46 @@ const generateEmailTemplate = (name, date) => `
 </html>
 `;
 
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
-const ApiCredential = require('../models/ApiCredential');
-const mongoose = require('mongoose');
-
-console.log("MongoDB URI: ", 'mongodb+srv://zenith:Zenith123@cluster0.i2uby.mongodb.net/EcoTracker_db?retryWrites=true&w=majority'); 
+let mailjet;
 
 const sendWasteDisposalReminder = async (userEmail, userName, scheduleDate) => {
     const emailTemplate = generateEmailTemplate(userName, scheduleDate);
+    // Ensure mailjet is initialized
+    if (!mailjet) {
+        mailjet = await initializeMailjet();
+    }
 
     try {
-        //The retrieval of Mailgun credentials is now correctly placed inside an async function
-         const mailgunCredentials = await ApiCredential.findOne({ serviceProvider: 'mailgun' });
-         if (!mailgunCredentials) {
-             console.error('Mailgun credentials not found');
-             return;
-         }
-
-        const apiKey =  'ecotracker';
-        const password = 'df1614430bf65fa0edda1410169068cd-4b670513-0821a00c'; 
-
-        console.log("api ", apiKey)
-
-        console.log("apipws ", password)
-        
-        const mg = mailgun.client({ username: apiKey, key: password });
-
-        mg.messages.create('sandbox59f183c411dc4c56a477e95cac396356.mailgun.org', {
-            from: 'ecotracker526@gmail.com',
-            to: userEmail,
-            subject: "Waste Disposal Reminder",
-            html: emailTemplate
-        })
-        .then(msg => console.log(msg)) 
-        .catch(err => console.log(err)); 
-
+        const response = await mailjet.post("send", {'version': 'v3.1'}).request({
+            Messages: [{
+                From: {
+                    Email: "merakib007@gmail.com", // Ensure this email is verified with Mailjet
+                    Name: "EcoTracker"
+                },
+                To: [{
+                    Email: userEmail,
+                    Name: userName
+                }],
+                Subject: "Waste Disposal Reminder",
+                HTMLPart: emailTemplate
+            }]
+        });
+        console.log("Email sent successfully!", response.body);
     } catch (error) {
         console.error('Error sending waste disposal reminder:', error);
     }
 };
 
+// Adjust your MongoDB URI as needed
 mongoose.connect('mongodb+srv://zenith:Zenith123@cluster0.i2uby.mongodb.net/EcoTracker_db?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true
-  })
-  .then(() => {
+})
+.then(async () => {
     console.log("MongoDB Connected");
-    sendWasteDisposalReminder('merakib007@gmail.com', 'Ecotracker Team', '2024-05-15');
-  })
-  .catch(err => {
+    mailjet = await initializeMailjet(); // Correctly initialize Mailjet here
+    sendWasteDisposalReminder('ecotracker526@gmail.com', 'Ecotracker Team', '2024-05-15');
+})
+.catch(err => {
     console.error("MongoDB Connection Error:", err);
-  });
+});

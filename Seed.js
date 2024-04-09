@@ -3,6 +3,7 @@ const Waste = require('./models/Waste');
 const WasteCategory = require('./models/WasteCategory'); 
 const Address = require('./models/Address'); 
 const Schedule = require('./models/Schedule'); 
+const ApiCredential = require('./models/ApiCredential');
 
 require('dotenv').config({ path: '.env.development' });
 
@@ -65,6 +66,14 @@ const seedDB = async () => {
       IDWasteCategories: [blueBin._id, garbageBin._id] 
     });
     await schedule.save();
+
+
+    const mailgunCredentials = new ApiCredential({
+      serviceProvider: 'Mailgun',
+      apiKey: 'ENCRYPTED_API_KEY_HERE',
+      password: 'ENCRYPTED_PASSWORD_HERE'
+    });
+    await mailgunCredentials.save();
 
     console.log('Database seeded!');
 

@@ -57,6 +57,8 @@ const dropOffRoutes = require("./routes/dropOffRoutes");
 const schedule = require("./routes/ScheduleRoutes");
 const address = require("./routes/addressRoutes");
 
+
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/waste", wasteRoutes);

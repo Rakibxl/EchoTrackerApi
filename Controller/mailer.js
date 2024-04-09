@@ -1,4 +1,8 @@
 
+
+require('dotenv').config();
+require('dotenv').config({ path: '.env.development' });
+
 const generateEmailTemplate = (name, date) => `
 <!DOCTYPE html>
 <html>
@@ -62,26 +66,56 @@ const generateEmailTemplate = (name, date) => `
 </html>
 `;
 
-require('dotenv').config();
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
+const ApiCredential = require('../models/ApiCredential');
+const mongoose = require('mongoose');
+
+console.log("MongoDB URI: ", 'mongodb+srv://zenith:Zenith123@cluster0.i2uby.mongodb.net/EcoTracker_db?retryWrites=true&w=majority'); 
 
 const sendWasteDisposalReminder = async (userEmail, userName, scheduleDate) => {
-  const emailTemplate = generateEmailTemplate(userName, scheduleDate);
-console.log("Api key", process.env.MAILGUN_API_KEY)
+    const emailTemplate = generateEmailTemplate(userName, scheduleDate);
 
-  const mg = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || ''});
+    try {
+        // The retrieval of Mailgun credentials is now correctly placed inside an async function
+        const mailgunCredentials = await ApiCredential.findOne({ serviceProvider: 'Mailgun' });
+        if (!mailgunCredentials) {
+            console.error('Mailgun credentials not found');
+            return;
+        }
 
-  mg.messages.create('sandboxfcaf96278def4413a3a215ab48b0b811.mailgun.org', {
-      from: 'merakib007@gmail.com',
-      to: userEmail,
-      subject: "Waste Disposal Reminder",
-      html: emailTemplate
-  })
-  .then(msg => console.log(msg)) // logs response data
-  .catch(err => console.log(err)); // logs any error
+        const apiKey = mailgunCredentials.apiKey;
+        const password = mailgunCredentials.password; 
+
+        console.log("api ", apiKey)
+
+        console.log("apipws ", password)
+        
+        const mg = mailgun.client({ username: apiKey, key: password });
+
+        mg.messages.create('sandboxfcaf96278def4413a3a215ab48b0b811.mailgun.org', {
+            from: 'merakib007@gmail.com',
+            to: userEmail,
+            subject: "Waste Disposal Reminder",
+            html: emailTemplate
+        })
+        .then(msg => console.log(msg)) 
+        .catch(err => console.log(err)); 
+
+    } catch (error) {
+        console.error('Error sending waste disposal reminder:', error);
+    }
 };
 
-// Example usage
-sendWasteDisposalReminder('rahmed89@my.centennialcollege.ca', 'Recipient Name', '2024-05-15');
+mongoose.connect('mongodb+srv://zenith:Zenith123@cluster0.i2uby.mongodb.net/EcoTracker_db?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("MongoDB Connected");
+    sendWasteDisposalReminder('ecotracker526@gmail.com', 'Ecotracker Team', '2024-05-15');
+  })
+  .catch(err => {
+    console.error("MongoDB Connection Error:", err);
+  });
